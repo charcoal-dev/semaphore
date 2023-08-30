@@ -92,7 +92,7 @@ class FilesystemLockTest extends TestCase
         $fiber->start($semaphore, $resourceId);
 
         // This will hang for up to 3 seconds... (as soon as fiber releases lock)
-        // Check every 0.5 second, maximum of 10 seconds
+        // Check every 0.25 second,
         $lock2 = $semaphore->obtainLock($resourceId, concurrentCheckEvery: 0.25);
         $this->assertTrue($lock2->isLocked());
 
