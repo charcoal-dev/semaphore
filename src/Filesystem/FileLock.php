@@ -60,7 +60,7 @@ class FileLock extends AbstractLock
         }
 
         $concurrentSleep = $concurrentCheckEvery && $concurrentCheckEvery > 0 ?
-            $concurrentCheckEvery * 10 ^ 6 : null;
+            (int)($concurrentCheckEvery * 1_000_000) : null;
 
         $timer = time();
         while (true) {
