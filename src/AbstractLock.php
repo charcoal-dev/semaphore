@@ -1,22 +1,16 @@
 <?php
-/*
- * This file is a part of "charcoal-dev/semaphore" package.
- * https://github.com/charcoal-dev/semaphore
- *
- * Copyright (c) Furqan A. Siddiqui <hello@furqansiddiqui.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code or visit following link:
- * https://github.com/charcoal-dev/semaphore/blob/main/LICENSE
+/**
+ * Part of the "charcoal-dev/semaphore" package.
+ * @link https://github.com/charcoal-dev/semaphore
  */
 
 declare(strict_types=1);
 
 namespace Charcoal\Semaphore;
 
-use Charcoal\OOP\Traits\NoDumpTrait;
-use Charcoal\OOP\Traits\NotCloneableTrait;
-use Charcoal\OOP\Traits\NotSerializableTrait;
+use Charcoal\Base\Traits\NoDumpTrait;
+use Charcoal\Base\Traits\NotCloneableTrait;
+use Charcoal\Base\Traits\NotSerializableTrait;
 
 /**
  * Class AbstractLock
@@ -33,7 +27,7 @@ abstract class AbstractLock
     use NoDumpTrait;
 
     /**
-     * @param \Charcoal\Semaphore\AbstractSemaphore $semaphore
+     * @param AbstractSemaphore $semaphore
      * @param string $resourceId
      * @param float|null $concurrentCheckEvery
      * @param int $concurrentTimeout

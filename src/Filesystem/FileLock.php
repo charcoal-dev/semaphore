@@ -1,13 +1,7 @@
 <?php
-/*
- * This file is a part of "charcoal-dev/semaphore" package.
- * https://github.com/charcoal-dev/semaphore
- *
- * Copyright (c) Furqan A. Siddiqui <hello@furqansiddiqui.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code or visit following link:
- * https://github.com/charcoal-dev/semaphore/blob/main/LICENSE
+/**
+ * Part of the "charcoal-dev/semaphore" package.
+ * @link https://github.com/charcoal-dev/semaphore
  */
 
 declare(strict_types=1);
@@ -32,11 +26,11 @@ class FileLock extends AbstractLock
     private mixed $fp;
 
     /**
-     * @param \Charcoal\Semaphore\FilesystemSemaphore $semaphore
+     * @param FilesystemSemaphore $semaphore
      * @param string $resourceId
      * @param float|null $concurrentCheckEvery
      * @param int $concurrentTimeout
-     * @throws \Charcoal\Semaphore\Exception\SemaphoreLockException
+     * @throws SemaphoreLockException
      */
     public function __construct(
         FilesystemSemaphore $semaphore,
@@ -96,7 +90,7 @@ class FileLock extends AbstractLock
 
     /**
      * @return void
-     * @throws \Charcoal\Semaphore\Exception\SemaphoreLockException
+     * @throws SemaphoreLockException
      */
     public function releaseLock(): void
     {
