@@ -9,8 +9,8 @@ declare(strict_types=1);
 namespace Charcoal\Semaphore\Filesystem;
 
 use Charcoal\Semaphore\AbstractLock;
-use Charcoal\Semaphore\Exception\SemaphoreLockError;
-use Charcoal\Semaphore\Exception\SemaphoreLockException;
+use Charcoal\Semaphore\Exceptions\SemaphoreLockError;
+use Charcoal\Semaphore\Exceptions\SemaphoreLockException;
 use Charcoal\Semaphore\FilesystemSemaphore;
 
 /**

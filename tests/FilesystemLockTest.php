@@ -10,7 +10,7 @@ namespace Charcoal\Semaphore\Tests;
 
 use Charcoal\Filesystem\Directory;
 use Charcoal\Semaphore\AbstractSemaphore;
-use Charcoal\Semaphore\Exception\SemaphoreLockError;
+use Charcoal\Semaphore\Exceptions\SemaphoreLockError;
 use Charcoal\Semaphore\FilesystemSemaphore;
 use PHPUnit\Framework\TestCase;
 
@@ -22,9 +22,9 @@ class FilesystemLockTest extends TestCase
 {
     /**
      * @return void
-     * @throws \Charcoal\Filesystem\Exception\FilesystemException
-     * @throws \Charcoal\Semaphore\Exception\SemaphoreException
-     * @throws \Charcoal\Semaphore\Exception\SemaphoreLockException
+     * @throws \Charcoal\Filesystem\Exceptions\FilesystemException
+     * @throws \Charcoal\Semaphore\Exceptions\SemaphoreException
+     * @throws \Charcoal\Semaphore\Exceptions\SemaphoreLockException
      */
     public function testBasicLock(): void
     {
@@ -42,9 +42,9 @@ class FilesystemLockTest extends TestCase
 
     /**
      * @return void
-     * @throws \Charcoal\Filesystem\Exception\FilesystemException
-     * @throws \Charcoal\Semaphore\Exception\SemaphoreException
-     * @throws \Charcoal\Semaphore\Exception\SemaphoreLockException
+     * @throws \Charcoal\Filesystem\Exceptions\FilesystemException
+     * @throws \Charcoal\Semaphore\Exceptions\SemaphoreException
+     * @throws \Charcoal\Semaphore\Exceptions\SemaphoreLockException
      */
     public function testConcurrencyTimeout(): void
     {
@@ -63,9 +63,9 @@ class FilesystemLockTest extends TestCase
 
     /**
      * @return void
-     * @throws \Charcoal\Filesystem\Exception\FilesystemException
-     * @throws \Charcoal\Semaphore\Exception\SemaphoreException
-     * @throws \Charcoal\Semaphore\Exception\SemaphoreLockException
+     * @throws \Charcoal\Filesystem\Exceptions\FilesystemException
+     * @throws \Charcoal\Semaphore\Exceptions\SemaphoreException
+     * @throws \Charcoal\Semaphore\Exceptions\SemaphoreLockException
      * @throws \Throwable
      */
     public function testCheckLockReleasedDuringConcurrency(): void

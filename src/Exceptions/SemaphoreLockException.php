@@ -6,11 +6,11 @@
 
 declare(strict_types=1);
 
-namespace Charcoal\Semaphore\Exception;
+namespace Charcoal\Semaphore\Exceptions;
 
 /**
  * Class SemaphoreLockException
- * @package Charcoal\Semaphore\Exception
+ * @package Charcoal\Semaphore\Exceptions
  */
 class SemaphoreLockException extends SemaphoreException
 {

@@ -9,7 +9,7 @@ declare(strict_types=1);
 namespace Charcoal\Semaphore;
 
 use Charcoal\Filesystem\Directory;
-use Charcoal\Semaphore\Exception\SemaphoreException;
+use Charcoal\Semaphore\Exceptions\SemaphoreException;
 use Charcoal\Semaphore\Filesystem\FileLock;
 
 /**
@@ -23,7 +23,7 @@ class FilesystemSemaphore extends AbstractSemaphore
     /**
      * @param Directory $directory
      * @throws SemaphoreException
-     * @throws \Charcoal\Filesystem\Exception\FilesystemException
+     * @throws \Charcoal\Filesystem\Exceptions\FilesystemException
      */
     public function __construct(Directory $directory)
     {
@@ -41,7 +41,7 @@ class FilesystemSemaphore extends AbstractSemaphore
      * @param float|null $concurrentCheckEvery
      * @param int $concurrentTimeout
      * @return FileLock
-     * @throws Exception\SemaphoreLockException
+     * @throws Exceptions\SemaphoreLockException
      */
     public function obtainLock(
         string $resourceId,

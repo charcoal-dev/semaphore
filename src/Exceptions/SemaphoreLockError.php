@@ -6,11 +6,11 @@
 
 declare(strict_types=1);
 
-namespace Charcoal\Semaphore\Exception;
+namespace Charcoal\Semaphore\Exceptions;
 
 /**
  * Class SemaphoreLockError
- * @package Charcoal\Semaphore\Exception
+ * @package Charcoal\Semaphore\Exceptions
  */
 enum SemaphoreLockError: int
 {
