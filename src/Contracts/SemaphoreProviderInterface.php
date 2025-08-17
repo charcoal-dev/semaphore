@@ -8,8 +8,6 @@ declare(strict_types=1);
 
 namespace Charcoal\Semaphore\Contracts;
 
-use Charcoal\Semaphore\AbstractLock;
-
 /**
  * Interface SemaphoreProviderInterface
  * @package Charcoal\Semaphore\Contracts
@@ -17,8 +15,8 @@ use Charcoal\Semaphore\AbstractLock;
 interface SemaphoreProviderInterface
 {
     public function obtainLock(
-        string $resourceId,
+        string $lockId,
         ?float $concurrentCheckEvery = null,
         int    $concurrentTimeout = 0
-    ): AbstractLock;
+    ): SemaphoreLockInterface;
 }

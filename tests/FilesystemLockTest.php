@@ -10,8 +10,8 @@ namespace Charcoal\Semaphore\Tests;
 
 use Charcoal\Filesystem\Node\PathInfo;
 use Charcoal\Semaphore\Contracts\SemaphoreProviderInterface;
-use Charcoal\Semaphore\Exceptions\SemaphoreLockError;
-use Charcoal\Semaphore\FilesystemSemaphore;
+use Charcoal\Semaphore\Enums\SemaphoreLockError;
+use Charcoal\Semaphore\Filesystem\FilesystemSemaphore;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -90,7 +90,6 @@ class FilesystemLockTest extends TestCase
         $lock2 = $semaphore->obtainLock($resourceId, concurrentCheckEvery: 0.25);
         $this->assertTrue($lock2->isLocked());
 
-        /** @var \Charcoal\Semaphore\AbstractLock $lock1 */
         $lock1 = $fiber->getReturn();
         $this->assertFalse($lock1->isLocked());
     }

@@ -6,14 +6,14 @@
 
 declare(strict_types=1);
 
-namespace Charcoal\Semaphore;
+namespace Charcoal\Semaphore\Filesystem;
 
 use Charcoal\Base\Support\Helpers\ObjectHelper;
 use Charcoal\Filesystem\Enums\PathType;
 use Charcoal\Filesystem\Node\PathInfo;
 use Charcoal\Semaphore\Contracts\SemaphoreProviderInterface;
 use Charcoal\Semaphore\Exceptions\SemaphoreException;
-use Charcoal\Semaphore\Filesystem\FileLock;
+use Charcoal\Semaphore\Exceptions\SemaphoreLockException;
 
 /**
  * Class FilesystemSemaphore
@@ -42,18 +42,18 @@ readonly class FilesystemSemaphore implements SemaphoreProviderInterface
     }
 
     /**
-     * @param string $resourceId
+     * @param string $lockId
      * @param float|null $concurrentCheckEvery
      * @param int $concurrentTimeout
      * @return FileLock
-     * @throws Exceptions\SemaphoreLockException
+     * @throws SemaphoreLockException
      */
     public function obtainLock(
-        string $resourceId,
+        string $lockId,
         ?float $concurrentCheckEvery = null,
         int    $concurrentTimeout = 0
     ): FileLock
     {
-        return new FileLock($this, $resourceId, $concurrentCheckEvery, $concurrentTimeout);
+        return new FileLock($this, $lockId, $concurrentCheckEvery, $concurrentTimeout);
     }
 }

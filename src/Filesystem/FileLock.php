@@ -9,44 +9,54 @@ declare(strict_types=1);
 namespace Charcoal\Semaphore\Filesystem;
 
 use Charcoal\Base\Support\ErrorHelper;
-use Charcoal\Semaphore\AbstractLock;
-use Charcoal\Semaphore\Exceptions\SemaphoreLockError;
+use Charcoal\Base\Traits\NoDumpTrait;
+use Charcoal\Base\Traits\NotCloneableTrait;
+use Charcoal\Base\Traits\NotSerializableTrait;
+use Charcoal\Semaphore\Contracts\SemaphoreLockInterface;
+use Charcoal\Semaphore\Enums\SemaphoreLockError;
 use Charcoal\Semaphore\Exceptions\SemaphoreLockException;
-use Charcoal\Semaphore\FilesystemSemaphore;
+use Charcoal\Semaphore\Exceptions\SemaphoreUnlockException;
 
 /**
  * Class FileLock
  * @package Charcoal\Semaphore\Filesystem
  */
-class FileLock extends AbstractLock
+class FileLock implements SemaphoreLockInterface
 {
     public readonly string $lockFilepath;
     public bool $deleteFileOnRelease = false;
+
+    protected ?float $previousTimestamp;
+    protected bool $isLocked = false;
+    protected bool $autoReleaseSet = false;
+
+    use NotSerializableTrait;
+    use NotCloneableTrait;
+    use NoDumpTrait;
 
     /** @var mixed|resource File-pointer resource or NULL */
     private mixed $fp;
 
     /**
-     * @param FilesystemSemaphore $semaphore
-     * @param string $resourceId must match regex: /^\w+$/
+     * @param FilesystemSemaphore $provider
+     * @param string $lockId must match regex: /^\w+$/
      * @param float|null $concurrentCheckEvery
      * @param int $concurrentTimeout
      * @throws SemaphoreLockException
      */
     public function __construct(
-        FilesystemSemaphore $semaphore,
-        string              $resourceId,
-        ?float              $concurrentCheckEvery = null,
-        int                 $concurrentTimeout = 0
+        public readonly FilesystemSemaphore $provider,
+        public readonly string              $lockId,
+        public readonly ?float              $concurrentCheckEvery = null,
+        public readonly int                 $concurrentTimeout = 0,
     )
     {
-        parent::__construct($semaphore, $resourceId, $concurrentCheckEvery, $concurrentTimeout);
-        if (!preg_match('/^\w+$/', $resourceId)) {
+        if (!preg_match('/^\w+$/', $lockId)) {
             throw new \InvalidArgumentException('Invalid resource identifier for semaphore emulator');
         }
 
         $this->lockFilepath = $this->provider->directory->absolute . DIRECTORY_SEPARATOR .
-            $resourceId . ".lock";
+            $lockId . ".lock";
 
         error_clear_last();
         $fp = @fopen($this->lockFilepath, "c+");
@@ -61,16 +71,18 @@ class FileLock extends AbstractLock
         $concurrentSleep = $concurrentCheckEvery && $concurrentCheckEvery > 0 ?
             (int)($concurrentCheckEvery * 1_000_000) : null;
 
-        $timer = time();
+        $timer = microtime(true);
         while (true) {
             if (!flock($fp, LOCK_EX | LOCK_NB)) {
                 if (!$concurrentSleep) {
+                    fclose($fp);
                     throw new SemaphoreLockException(SemaphoreLockError::CONCURRENT_REQUEST_BLOCKED);
                 }
 
                 usleep($concurrentSleep);
                 if ($concurrentTimeout > 0) {
-                    if ((time() - $timer) >= $concurrentTimeout) {
+                    if ((microtime(true) - $timer) >= $concurrentTimeout) {
+                        fclose($fp);
                         throw new SemaphoreLockException(SemaphoreLockError::CONCURRENT_REQUEST_TIMEOUT);
                     }
                 }
@@ -81,7 +93,7 @@ class FileLock extends AbstractLock
             break;
         }
 
-        $previousTimestamp = fread($fp, 15);
+        $previousTimestamp = fread($fp, 32);
         if ($previousTimestamp) {
             $this->previousTimestamp = floatval($previousTimestamp);
         }
@@ -89,21 +101,24 @@ class FileLock extends AbstractLock
         ftruncate($fp, 0);
         fseek($fp, 0, SEEK_SET);
         @fwrite($fp, strval(microtime(true)));
-        $this->isLocked = true;
-        $this->fp = $fp;
+        fflush($fp);
 
         if ($error = ErrorHelper::lastErrorToRuntimeException()) {
+            fclose($fp);
             throw new SemaphoreLockException(
                 SemaphoreLockError::LOCK_OBTAIN_ERROR,
-                "A filesystem error occurred while obtaining lock: $error",
+                "Filesystem error: " . $error->getMessage(),
                 previous: $error
             );
         }
+
+        $this->isLocked = true;
+        $this->fp = $fp;
     }
 
     /**
      * @return void
-     * @throws SemaphoreLockException
+     * @throws SemaphoreUnlockException
      */
     public function releaseLock(): void
     {
@@ -111,23 +126,70 @@ class FileLock extends AbstractLock
             return;
         }
 
-        $unlock = flock($this->fp, LOCK_UN);
-        if (!$unlock) {
-            throw new SemaphoreLockException(SemaphoreLockError::LOCK_RELEASE_ERROR);
-        }
-
         $this->isLocked = false;
+        $unlock = flock($this->fp, LOCK_UN);
         fclose($this->fp);
         $this->fp = null;
 
+        if (!$unlock) {
+            throw new SemaphoreUnlockException("flock() failed");
+        }
+
         if ($this->deleteFileOnRelease) {
-            if (@unlink($this->lockFilepath)) {
-                throw new SemaphoreLockException(
-                    SemaphoreLockError::LOCK_RELEASE_ERROR,
+            if (!@unlink($this->lockFilepath)) {
+                throw new SemaphoreUnlockException(
                     "Failed to delete lock file",
                     captureLastError: true
                 );
             }
         }
+    }
+
+    /**
+     * @return bool
+     */
+    public function isLocked(): bool
+    {
+        return $this->isLocked;
+    }
+
+    /**
+     * @return void
+     * @throws SemaphoreUnlockException
+     */
+    public function setAutoRelease(): void
+    {
+        if ($this->autoReleaseSet) {
+            return;
+
+        }
+
+        $resourceLock = $this;
+        register_shutdown_function(function () use ($resourceLock) {
+            $resourceLock->releaseLock();
+        });
+
+        $this->autoReleaseSet = true;
+    }
+
+    /**
+     * @return float|null
+     */
+    public function previousTimestamp(): ?float
+    {
+        return $this->previousTimestamp;
+    }
+
+    /**
+     * @param float $seconds
+     * @return bool
+     */
+    public function checkElapsedTime(float $seconds): bool
+    {
+        if (!$this->previousTimestamp) {
+            return true;
+        }
+
+        return ((microtime(true) - $this->previousTimestamp) >= $seconds);
     }
 }

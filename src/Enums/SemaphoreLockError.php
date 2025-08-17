@@ -6,7 +6,7 @@
 
 declare(strict_types=1);
 
-namespace Charcoal\Semaphore\Exceptions;
+namespace Charcoal\Semaphore\Enums;
 
 /**
  * Class SemaphoreLockError
@@ -17,5 +17,4 @@ enum SemaphoreLockError: int
     case LOCK_OBTAIN_ERROR = 100;
     case CONCURRENT_REQUEST_BLOCKED = 200;
     case CONCURRENT_REQUEST_TIMEOUT = 300;
-    case LOCK_RELEASE_ERROR = 1100;
 }
