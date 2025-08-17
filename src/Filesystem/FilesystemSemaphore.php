@@ -10,7 +10,7 @@ namespace Charcoal\Semaphore\Filesystem;
 
 use Charcoal\Base\Support\Helpers\ObjectHelper;
 use Charcoal\Filesystem\Enums\PathType;
-use Charcoal\Filesystem\Node\PathInfo;
+use Charcoal\Filesystem\Path\DirectoryPath;
 use Charcoal\Semaphore\Contracts\SemaphoreProviderInterface;
 use Charcoal\Semaphore\Exceptions\SemaphoreException;
 use Charcoal\Semaphore\Exceptions\SemaphoreLockException;
@@ -22,22 +22,17 @@ use Charcoal\Semaphore\Exceptions\SemaphoreLockException;
 readonly class FilesystemSemaphore implements SemaphoreProviderInterface
 {
     /**
-     * @param PathInfo $directory
+     * @param DirectoryPath $directory
      * @throws SemaphoreException
      */
-    public function __construct(public PathInfo $directory)
+    public function __construct(public DirectoryPath $directory)
     {
-        if ($directory->type !== PathType::Directory) {
-            throw new SemaphoreException(ObjectHelper::baseClassName(static::class) .
-                " expects a directory path, got " . $directory->type->name);
-        }
-
         $permissions = DIRECTORY_SEPARATOR === "\\" ? $directory->writable
             : ($directory->writable && $directory->executable);
         if (!$permissions) {
             throw new SemaphoreException(
                 sprintf('Semaphore lacks required directory perms for file locks: "%s/"',
-                    $directory->basename));
+                    basename($directory->absolute)));
         }
     }
 
