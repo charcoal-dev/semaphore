@@ -8,8 +8,6 @@ declare(strict_types=1);
 
 namespace Charcoal\Semaphore\Filesystem;
 
-use Charcoal\Base\Support\Helpers\ObjectHelper;
-use Charcoal\Filesystem\Enums\PathType;
 use Charcoal\Filesystem\Path\DirectoryPath;
 use Charcoal\Semaphore\Contracts\SemaphoreProviderInterface;
 use Charcoal\Semaphore\Exceptions\SemaphoreException;
