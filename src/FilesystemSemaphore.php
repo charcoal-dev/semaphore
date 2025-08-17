@@ -8,7 +8,10 @@ declare(strict_types=1);
 
 namespace Charcoal\Semaphore;
 
-use Charcoal\Filesystem\Directory;
+use Charcoal\Base\Support\Helpers\ObjectHelper;
+use Charcoal\Filesystem\Enums\PathType;
+use Charcoal\Filesystem\Node\PathInfo;
+use Charcoal\Semaphore\Contracts\SemaphoreProviderInterface;
 use Charcoal\Semaphore\Exceptions\SemaphoreException;
 use Charcoal\Semaphore\Filesystem\FileLock;
 
@@ -16,24 +19,26 @@ use Charcoal\Semaphore\Filesystem\FileLock;
  * Class FilesystemSemaphore
  * @package Charcoal\Semaphore
  */
-class FilesystemSemaphore extends AbstractSemaphore
+readonly class FilesystemSemaphore implements SemaphoreProviderInterface
 {
-    public readonly string $directory;
-
     /**
-     * @param Directory $directory
+     * @param PathInfo $directory
      * @throws SemaphoreException
-     * @throws \Charcoal\Filesystem\Exceptions\FilesystemException
      */
-    public function __construct(Directory $directory)
+    public function __construct(public PathInfo $directory)
     {
-        if (!$directory->isReadable()) {
-            throw new SemaphoreException('Semaphore locks directory is not readable');
-        } elseif (!$directory->isWritable()) {
-            throw new SemaphoreException('Semaphore locks directory is not writable');
+        if ($directory->type !== PathType::Directory) {
+            throw new SemaphoreException(ObjectHelper::baseClassName(static::class) .
+                " expects a directory path, got " . $directory->type->name);
         }
 
-        $this->directory = $directory->path;
+        $permissions = DIRECTORY_SEPARATOR === "\\" ? $directory->writable
+            : ($directory->writable && $directory->executable);
+        if (!$permissions) {
+            throw new SemaphoreException(
+                sprintf('Semaphore lacks required directory perms for file locks: "%s/"',
+                    $directory->basename));
+        }
     }
 
     /**

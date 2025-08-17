@@ -11,6 +11,7 @@ namespace Charcoal\Semaphore;
 use Charcoal\Base\Traits\NoDumpTrait;
 use Charcoal\Base\Traits\NotCloneableTrait;
 use Charcoal\Base\Traits\NotSerializableTrait;
+use Charcoal\Semaphore\Contracts\SemaphoreProviderInterface;
 
 /**
  * Class AbstractLock
@@ -27,16 +28,16 @@ abstract class AbstractLock
     use NoDumpTrait;
 
     /**
-     * @param AbstractSemaphore $semaphore
+     * @param SemaphoreProviderInterface $provider
      * @param string $resourceId
      * @param float|null $concurrentCheckEvery
      * @param int $concurrentTimeout
      */
     public function __construct(
-        public readonly AbstractSemaphore $semaphore,
-        public readonly string            $resourceId,
-        public readonly ?float            $concurrentCheckEvery = null,
-        public readonly int               $concurrentTimeout = 0
+        public readonly SemaphoreProviderInterface $provider,
+        public readonly string                     $resourceId,
+        public readonly ?float                     $concurrentCheckEvery = null,
+        public readonly int                        $concurrentTimeout = 0
     )
     {
     }

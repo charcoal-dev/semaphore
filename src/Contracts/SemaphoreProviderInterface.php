@@ -6,15 +6,17 @@
 
 declare(strict_types=1);
 
-namespace Charcoal\Semaphore;
+namespace Charcoal\Semaphore\Contracts;
+
+use Charcoal\Semaphore\AbstractLock;
 
 /**
- * Class AbstractSemaphore
- * @package Charcoal\Semaphore
+ * Interface SemaphoreProviderInterface
+ * @package Charcoal\Semaphore\Contracts
  */
-abstract class AbstractSemaphore
+interface SemaphoreProviderInterface
 {
-    abstract public function obtainLock(
+    public function obtainLock(
         string $resourceId,
         ?float $concurrentCheckEvery = null,
         int    $concurrentTimeout = 0

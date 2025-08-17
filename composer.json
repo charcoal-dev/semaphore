@@ -14,8 +14,8 @@
   ],
   "require": {
     "php": "^8.3",
-    "charcoal-dev/base": ">=0.0.13 <0.1.0",
-    "charcoal-dev/filesystem": "^0.2.1"
+    "charcoal-dev/base": ">=0.0.15 <0.1.0",
+    "charcoal-dev/filesystem": "^0.2.2"
   },
   "autoload": {
     "psr-4": {

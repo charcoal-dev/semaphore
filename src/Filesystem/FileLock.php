@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Charcoal\Semaphore\Filesystem;
 
+use Charcoal\Base\Support\ErrorHelper;
 use Charcoal\Semaphore\AbstractLock;
 use Charcoal\Semaphore\Exceptions\SemaphoreLockError;
 use Charcoal\Semaphore\Exceptions\SemaphoreLockException;
@@ -27,7 +28,7 @@ class FileLock extends AbstractLock
 
     /**
      * @param FilesystemSemaphore $semaphore
-     * @param string $resourceId
+     * @param string $resourceId must match regex: /^\w+$/
      * @param float|null $concurrentCheckEvery
      * @param int $concurrentTimeout
      * @throws SemaphoreLockException
@@ -44,12 +45,16 @@ class FileLock extends AbstractLock
             throw new \InvalidArgumentException('Invalid resource identifier for semaphore emulator');
         }
 
-        $this->lockFilepath = $this->semaphore->directory . DIRECTORY_SEPARATOR . $resourceId . ".lock";
-        $fp = fopen($this->lockFilepath, "c+");
+        $this->lockFilepath = $this->provider->directory->absolute . DIRECTORY_SEPARATOR .
+            $resourceId . ".lock";
+
+        error_clear_last();
+        $fp = @fopen($this->lockFilepath, "c+");
         if (!$fp) {
             throw new SemaphoreLockException(
                 SemaphoreLockError::LOCK_OBTAIN_ERROR,
-                "Cannot get pointer resource to lock file"
+                "Cannot get pointer resource to lock file",
+                captureLastError: true
             );
         }
 
@@ -83,9 +88,17 @@ class FileLock extends AbstractLock
 
         ftruncate($fp, 0);
         fseek($fp, 0, SEEK_SET);
-        fwrite($fp, strval(microtime(true)));
+        @fwrite($fp, strval(microtime(true)));
         $this->isLocked = true;
         $this->fp = $fp;
+
+        if ($error = ErrorHelper::lastErrorToRuntimeException()) {
+            throw new SemaphoreLockException(
+                SemaphoreLockError::LOCK_OBTAIN_ERROR,
+                "A filesystem error occurred while obtaining lock: $error",
+                previous: $error
+            );
+        }
     }
 
     /**
@@ -108,7 +121,13 @@ class FileLock extends AbstractLock
         $this->fp = null;
 
         if ($this->deleteFileOnRelease) {
-            unlink($this->lockFilepath);
+            if (@unlink($this->lockFilepath)) {
+                throw new SemaphoreLockException(
+                    SemaphoreLockError::LOCK_RELEASE_ERROR,
+                    "Failed to delete lock file",
+                    captureLastError: true
+                );
+            }
         }
     }
 }
