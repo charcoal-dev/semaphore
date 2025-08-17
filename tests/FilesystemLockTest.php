@@ -8,7 +8,7 @@ declare(strict_types=1);
 
 namespace Charcoal\Semaphore\Tests;
 
-use Charcoal\Filesystem\Node\PathInfo;
+use Charcoal\Filesystem\Path\DirectoryPath;
 use Charcoal\Semaphore\Contracts\SemaphoreProviderInterface;
 use Charcoal\Semaphore\Enums\SemaphoreLockError;
 use Charcoal\Semaphore\Filesystem\FilesystemSemaphore;
@@ -29,7 +29,7 @@ class FilesystemLockTest extends TestCase
     public function testBasicLock(): void
     {
         $resourceId = "basic_resource_1";
-        $semaphore = new FilesystemSemaphore(new PathInfo(__DIR__ . DIRECTORY_SEPARATOR . "temp"));
+        $semaphore = new FilesystemSemaphore(new DirectoryPath(__DIR__ . DIRECTORY_SEPARATOR . "temp"));
 
         $lock1 = $semaphore->obtainLock($resourceId, concurrentCheckEvery: null);
         $this->assertTrue($lock1->isLocked(), "Lock obtained successfully");
@@ -49,7 +49,7 @@ class FilesystemLockTest extends TestCase
     public function testConcurrencyTimeout(): void
     {
         $resourceId = "some_resource_2";
-        $semaphore = new FilesystemSemaphore(new PathInfo(__DIR__ . DIRECTORY_SEPARATOR . "temp"));
+        $semaphore = new FilesystemSemaphore(new DirectoryPath(__DIR__ . DIRECTORY_SEPARATOR . "temp"));
 
         $lock1 = $semaphore->obtainLock($resourceId, concurrentCheckEvery: null);
         $this->assertTrue($lock1->isLocked(), "Lock obtained successfully");
@@ -71,7 +71,7 @@ class FilesystemLockTest extends TestCase
     public function testCheckLockReleasedDuringConcurrency(): void
     {
         $resourceId = "some_resource_3";
-        $semaphore = new FilesystemSemaphore(new PathInfo(__DIR__ . DIRECTORY_SEPARATOR . "temp"));
+        $semaphore = new FilesystemSemaphore(new DirectoryPath(__DIR__ . DIRECTORY_SEPARATOR . "temp"));
 
         $fiber = new \Fiber(function (SemaphoreProviderInterface $semaphore, string $resourceId) {
             $lock1 = $semaphore->obtainLock($resourceId, concurrentCheckEvery: null);
