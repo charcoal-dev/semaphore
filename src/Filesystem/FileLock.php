@@ -8,7 +8,7 @@ declare(strict_types=1);
 
 namespace Charcoal\Semaphore\Filesystem;
 
-use Charcoal\Base\Support\ErrorHelper;
+use Charcoal\Base\Support\Helpers\ErrorHelper;
 use Charcoal\Base\Traits\NoDumpTrait;
 use Charcoal\Base\Traits\NotCloneableTrait;
 use Charcoal\Base\Traits\NotSerializableTrait;

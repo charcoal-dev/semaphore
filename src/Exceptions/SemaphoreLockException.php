@@ -8,7 +8,7 @@ declare(strict_types=1);
 
 namespace Charcoal\Semaphore\Exceptions;
 
-use Charcoal\Base\Support\ErrorHelper;
+use Charcoal\Base\Support\Helpers\ErrorHelper;
 use Charcoal\Semaphore\Enums\SemaphoreLockError;
 
 /**
