@@ -8,22 +8,18 @@ declare(strict_types=1);
 
 namespace Charcoal\Semaphore\Exceptions;
 
-use Charcoal\Base\Support\Helpers\ErrorHelper;
 use Charcoal\Semaphore\Enums\SemaphoreLockError;
 
 /**
- * Class SemaphoreLockException
- * @package Charcoal\Semaphore\Exceptions
+ * Represents an exception thrown when a semaphore lock encounters an error.
  */
 class SemaphoreLockException extends SemaphoreException
 {
     public function __construct(
         public readonly SemaphoreLockError $error,
         string                             $message = "",
-        bool                               $captureLastError = false,
         ?\Throwable                        $previous = null)
     {
-        parent::__construct($message ?: $this->error->name, $this->error->value, previous: $captureLastError ?
-            ErrorHelper::lastErrorToRuntimeException() : $previous);
+        parent::__construct($message ?: $this->error->name, $this->error->value, $previous);
     }
 }

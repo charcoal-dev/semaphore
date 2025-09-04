@@ -9,12 +9,13 @@ declare(strict_types=1);
 namespace Charcoal\Semaphore\Contracts;
 
 /**
- * Interface SemaphoreLockInterface
- * @package Charcoal\Semaphore\Contracts
- * @property-read string $lockId
+ * Provides an interface for managing semaphore locks with unique identifiers
+ * and additional functionality for lock state checks, time management, and auto-release behavior.
  */
 interface SemaphoreLockInterface
 {
+    public function lockId(): string;
+
     public function releaseLock(): void;
 
     public function isLocked(): bool;

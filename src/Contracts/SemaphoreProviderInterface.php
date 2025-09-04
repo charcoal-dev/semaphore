@@ -9,8 +9,7 @@ declare(strict_types=1);
 namespace Charcoal\Semaphore\Contracts;
 
 /**
- * Interface SemaphoreProviderInterface
- * @package Charcoal\Semaphore\Contracts
+ * Interface describing the contract for managing semaphore locks.
  */
 interface SemaphoreProviderInterface
 {

@@ -9,8 +9,8 @@ declare(strict_types=1);
 namespace Charcoal\Semaphore\Enums;
 
 /**
- * Class SemaphoreLockError
- * @package Charcoal\Semaphore\Exceptions
+ * This enum provides integer-based error codes for various lock-related scenarios,
+ * helping to differentiate between specific errors during semaphore lock handling.
  */
 enum SemaphoreLockError: int
 {
