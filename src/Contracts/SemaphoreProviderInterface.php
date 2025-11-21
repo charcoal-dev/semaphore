@@ -14,8 +14,9 @@ namespace Charcoal\Semaphore\Contracts;
 interface SemaphoreProviderInterface
 {
     public function obtainLock(
-        string $lockId,
-        ?float $concurrentCheckEvery = null,
-        int    $concurrentTimeout = 0
+        string  $lockId,
+        ?float  $concurrentCheckEvery = null,
+        int     $concurrentTimeout = 0,
+        ?string $namespace = null
     ): SemaphoreLockInterface;
 }
