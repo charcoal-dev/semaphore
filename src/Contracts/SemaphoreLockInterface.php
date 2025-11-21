@@ -16,6 +16,8 @@ interface SemaphoreLockInterface
 {
     public function lockId(): string;
 
+    public function namespace(): ?string;
+
     public function releaseLock(): void;
 
     public function isLocked(): bool;
